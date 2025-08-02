@@ -1,23 +1,15 @@
-📁 backend/   → Node.js (Express.js)  
-📁 llm/       → Python (FastAPI or Flask)
-
----
-
-## ✅ `.gitignore` (place this in your root directory)
-
-```gitignore
 # ---- GLOBAL ----
 .env
 .env.*.local
 .DS_Store
-node_modules/
-__pycache__/
+*.log
+*.tmp
+*.pptx
 *.pyc
 *.pyo
 *.pyd
-*.log
 
-# ---- BACKEND FOLDER (Node.js) ----
+# ---- BACKEND FOLDER (Node.js - Express) ----
 /backend/node_modules/
 /backend/.env
 /backend/package-lock.json
@@ -26,20 +18,19 @@ __pycache__/
 /backend/.next/
 /backend/.cache/
 
-# ---- LLM FOLDER (Python) ----
+# ---- LLM FOLDER (Python - FastAPI or Flask) ----
 /llm/__pycache__/
 /llm/.env
-/llm/.venv
+/llm/.venv/
 /llm/venv/
 /llm/.pytest_cache/
 /llm/*.egg-info/
 /llm/.mypy_cache/
 /llm/outputs/
 /llm/.ipynb_checkpoints/
+/llm/uploads/
 
 # ---- SHARED & TEMP ----
 /shared/*.pdf
 /shared/*.docx
 /temp/
-*.pptx
-*.tmp
