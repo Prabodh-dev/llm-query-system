@@ -1,0 +1,7 @@
+pdfplumber>=0.8.0
+python-docx>=0.8.11
+extract-msg>=0.28.0
+beautifulsoup4>=4.12.0
+flask>=2.0.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
