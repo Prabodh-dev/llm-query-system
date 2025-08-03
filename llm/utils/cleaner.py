@@ -6,7 +6,7 @@ def clean_text(
         text: str,
         lowercase: bool =  True,
         remove_non_ascii: bool =  True,
-        remove_punctuation: bool = False,
+        remove_punctuation: bool = True,
         collapse_whitespace: bool =  True,
 ) -> str:
     """
@@ -49,10 +49,10 @@ def remove_control_chars (text: str) ->str :
     return "".join(ch for ch in text if ch.isprintable() or ch.isspace())
 
 # enaku therija testing 
-if __name__ == "__main__":
-    sample_text = "PODU IDHU dhan sample text!!\n          EXTRA&*)@*$# SPACE LAMM!!, \tpunctuation oda and enaku ThrINja unicode--lam--.."
-    print("Original text:", sample_text)
-    cleaned = clean_text(sample_text, lowercase=True, remove_non_ascii=False, remove_punctuation=False, collapse_whitespace=True)
-    print("cleaned", cleaned)
-    cleaned_no_controls = remove_control_chars(cleaned)
-    print("cleaned_no_controls", cleaned_no_controls)
+# if __name__ == "__main__":
+#     sample_text = "PODU IDHU dhan sample text!!\n          EXTRA&*)@*$# SPACE LAMM!!, \tpunctuation oda and enaku ThrINja unicode--lam--.."
+#     print("Original text:", sample_text)
+#     cleaned = clean_text(sample_text, lowercase=True, remove_non_ascii=False, remove_punctuation=False, collapse_whitespace=True)
+#     print("cleaned", cleaned)
+#     cleaned_no_controls = remove_control_chars(cleaned)
+#     print("cleaned_no_controls", cleaned_no_controls)
