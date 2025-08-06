@@ -1,30 +1,34 @@
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
-load_dotenv()
+import json
+from typing import List
+from schemas import Clause
 
+load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-def run_gemini_chain(query, clauses):
+def run_gemini_chain(questions: List[str], clauses: List[Clause]) -> List[str]:
     try:
         model = genai.GenerativeModel("models/gemini-1.5-flash")
 
+        # Prepare context from clause text
         context = "\n\n".join([c.clause_text for c in clauses])
+        question_str = "\n".join(questions)
 
+        # Prompt
         prompt = (
             "You are a document assistant. Based on the insurance policy clauses below, answer each user question clearly and concisely. "
             "Return a JSON array with one answer per question. "
-            "Each answer must be a **single-line** string, even if long. "
-            "Do not return extra text, explanation, or labels.\n\n"
+            "Each answer must be a single-line string. No labels, no explanation, no markdown.\n\n"
             f"Policy Clauses:\n{context}\n\n"
-            f"Questions:\n{query}"
+            f"Questions:\n{question_str}"
         )
 
         response = model.generate_content(prompt)
         text = response.text.strip()
 
-        
-        import json
+        # Extract JSON array from model output
         start = text.find("[")
         end = text.rfind("]") + 1
 
