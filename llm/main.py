@@ -26,7 +26,10 @@ async def generate(request: Request):
             return JSONResponse(status_code=400, content={"error": "Missing documents or questions"})
 
         # Download PDF
+        print("🌐 Downloading PDF from:", pdf_url)
         pdf_response = requests.get(pdf_url)
+        print("📥 PDF Status Code:", pdf_response.status_code)
+
         if pdf_response.status_code != 200:
             return JSONResponse(status_code=400, content={"error": "Unable to download PDF"})
 
@@ -55,7 +58,6 @@ async def generate(request: Request):
     except Exception as e:
         print("❌ Error in /generate:", str(e))
         return JSONResponse(content={"answers": [f"LLM error: {str(e)}"]}, status_code=500)
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
