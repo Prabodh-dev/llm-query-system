@@ -7,7 +7,7 @@ import logger from "../utils/logger.js";
 
 const router = express.Router();
 
-// ✅ Bearer Token Middleware
+// Bearer Token Middleware
 router.use((req, res, next) => {
   const token = req.headers["authorization"];
   if (!token || token !== `Bearer ${process.env.HACKRX_API_KEY}`) {
@@ -17,7 +17,7 @@ router.use((req, res, next) => {
   next();
 });
 
-// ✅ POST /run route
+// POST /run route
 router.post("/run", async (req, res) => {
   try {
     const { documents, questions } = req.body;
@@ -27,7 +27,7 @@ router.post("/run", async (req, res) => {
       return res.status(400).json({ error: "Missing documents or questions" });
     }
 
-    // ✅ Save downloaded PDF locally
+    // Save downloaded PDF locally
     const filePath = path.join(path.resolve("temp"), `doc_${Date.now()}.pdf`);
     const response = await axios.get(documents, { responseType: "stream" });
 
@@ -40,12 +40,12 @@ router.post("/run", async (req, res) => {
 
     logger.info("📄 PDF downloaded successfully");
 
-    // ✅ Prepare form data for FastAPI
+    // Prepare form data for FastAPI
     const formData = new FormData();
     formData.append("file", fs.createReadStream(filePath));
-    formData.append("query", JSON.stringify(questions)); // All questions sent as array
+    formData.append("query", JSON.stringify(questions));
 
-    // ✅ Send request to FastAPI
+    // Send request to FastAPI
     const llmRes = await axios.post(
       "http://localhost:8000/generate",
       formData,
@@ -54,10 +54,10 @@ router.post("/run", async (req, res) => {
       }
     );
 
-    fs.unlinkSync(filePath); // ✅ Clean up temp file
-    logger.info("✅ LLM processing complete");
+    fs.unlinkSync(filePath); // Clean up temp file
+    logger.info(" LLM processing complete");
 
-    // ✅ Return clean final response
+    // Return clean final response
     return res.status(200).json({
       answers: llmRes.data.answers || [],
     });

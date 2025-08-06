@@ -23,7 +23,7 @@ def run_gemini_chain(query, clauses):
         response = model.generate_content(prompt)
         text = response.text.strip()
 
-        # Try to extract JSON-like list from the model output
+        
         import json
         start = text.find("[")
         end = text.rfind("]") + 1
