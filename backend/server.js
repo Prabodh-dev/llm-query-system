@@ -8,10 +8,13 @@ const app = express();
 
 app.use(express.json());
 
+// Mount the /hackrx/run route
+import runRoute from "./routes/run.js";
+app.use("/hackrx", runRoute);
+
+// Optional: Logging middleware
+// import logger from './utils/logger'; app.use(logger);
+
 const server = app.listen(PORT, () => {
-  try {
-    console.log(`Server running on PORT:${PORT}`);
-  } catch (err) {
-    console.log("Server connection error");
-  }
+  console.log(`🚀 Backend running on PORT: ${PORT}`);
 });
