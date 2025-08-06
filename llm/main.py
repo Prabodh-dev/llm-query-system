@@ -18,6 +18,10 @@ async def generate(request: Request):
         pdf_url = body.get("documents")
         questions = body.get("questions")
 
+        print("📥 Received request")
+        print("📄 Document URL:", pdf_url)
+        print("❓ Questions:", questions)
+
         if not pdf_url or not questions:
             return JSONResponse(status_code=400, content={"error": "Missing documents or questions"})
 
@@ -30,12 +34,18 @@ async def generate(request: Request):
             tmp.write(pdf_response.content)
             temp_path = tmp.name
 
+        print("✅ PDF downloaded:", temp_path)
+
         # Extract clauses
         clauses = load_pdf_clauses(temp_path)
         os.remove(temp_path)
 
+        print(f"🔍 Extracted {len(clauses)} clauses")
+
         # Run Gemini chain
         answers = run_gemini_chain(questions, clauses)
+
+        print("✅ Gemini answers:", answers)
 
         return {
             "answers": answers,
@@ -43,7 +53,9 @@ async def generate(request: Request):
         }
 
     except Exception as e:
+        print("❌ Error in /generate:", str(e))
         return JSONResponse(content={"answers": [f"LLM error: {str(e)}"]}, status_code=500)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
