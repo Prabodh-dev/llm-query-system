@@ -16,16 +16,17 @@ def run_gemini_chain(questions: List[str], clauses: List[Clause]) -> List[str]:
         context = "\n\n".join([c.clause_text for c in clauses])
         question_str = "\n".join(questions)
 
-        # Prompt
+        # Medium 1–2 line answers prompt
         prompt = (
-            "You are a document assistant. Based on the insurance policy clauses below, answer each user question clearly and concisely. "
-            "Return a JSON array with one answer per question. "
-            "Each answer must be a single-line string. No labels, no explanation, no markdown.\n\n"
+            "You are a document assistant. Based on the insurance policy clauses below, "
+            "answer each user question in 1–2 lines. Be accurate, concise, and complete. "
+            "Return a JSON array with one string per answer, preserving the order of questions. "
+            "No extra labels or formatting.\n\n"
             f"Policy Clauses:\n{context}\n\n"
             f"Questions:\n{question_str}"
         )
 
-        print("🧠 Sending prompt to Gemini:\n", prompt[:500])  # Limit for logs
+        print("🧠 Sending prompt to Gemini:\n", prompt[:500])
         response = model.generate_content(prompt)
 
         text = response.text.strip()
