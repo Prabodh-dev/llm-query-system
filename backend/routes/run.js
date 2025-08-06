@@ -6,50 +6,46 @@ dotenv.config();
 
 const router = express.Router();
 
-// ✅ Bearer Token Auth Middleware
+// Authorization middleware
 router.use((req, res, next) => {
   const token = req.headers["authorization"];
   const expected = `Bearer ${process.env.HACKRX_API_KEY}`;
-
   if (!token || token !== expected) {
-    logger.warn("⛔ Unauthorized access attempt.");
+    logger.warn("Unauthorized access attempt.");
     return res.status(401).json({ error: "Unauthorized" });
   }
-
   next();
 });
 
-// ✅ POST /hackrx/run
+// POST /hackrx/run
 router.post("/run", async (req, res) => {
+  const { documents, questions } = req.body;
+
+  if (!documents || !Array.isArray(questions) || !questions.length) {
+    logger.warn("❌ Missing documents or questions");
+    return res.status(400).json({ error: "Missing documents or questions" });
+  }
+
   try {
-    const { documents, questions } = req.body;
+    const llmUrl = `${process.env.LLM_API_URL}/generate`;
+    logger.info(`📡 Calling LLM at: ${llmUrl}`);
 
-    if (!documents || !Array.isArray(questions) || questions.length === 0) {
-      logger.warn("⚠️ Missing documents or questions in request body");
-      return res.status(400).json({ error: "Missing documents or questions" });
-    }
+    const llmRes = await axios.post(llmUrl, { documents, questions });
 
-    logger.info("📤 Sending request to FastAPI LLM...");
-
-    const llmResponse = await axios.post(
-      `${process.env.LLM_API_URL}/generate`,
-      {
-        documents,
-        questions,
-      }
-    );
-
-    const { answers, relevant_clauses } = llmResponse.data;
-
-    logger.info("✅ Response received from LLM");
+    logger.info("✅ LLM responded");
 
     return res.status(200).json({
-      answers: answers || [],
-      relevant_clauses: relevant_clauses || [],
+      answers: llmRes.data.answers || [],
+      relevant_clauses: llmRes.data.relevant_clauses || [],
     });
-  } catch (error) {
-    logger.error("❌ Error in /hackrx/run:", error.message);
-    return res.status(500).json({ error: "LLM processing failed" });
+  } catch (err) {
+    logger.error("❌ LLM proxy error:", err.message);
+    console.error("📛 LLM ERROR:", err?.response?.data || err);
+
+    return res.status(502).json({
+      error: "Failed to fetch from LLM",
+      details: err?.response?.data || err.message,
+    });
   }
 });
 
