@@ -1,15 +1,12 @@
 import express from "express";
 import axios from "axios";
-import fs from "fs";
-import path from "path";
-import FormData from "form-data";
 import logger from "../utils/logger.js";
 import dotenv from "dotenv";
 dotenv.config();
 
 const router = express.Router();
 
-//  Bajaj API Bearer Token Middleware
+// Bajaj API Bearer Token Middleware
 router.use((req, res, next) => {
   const token = req.headers["authorization"];
   if (!token || token !== `Bearer ${process.env.HACKRX_API_KEY}`) {
@@ -19,7 +16,7 @@ router.use((req, res, next) => {
   next();
 });
 
-//  POST /hackrx/run
+// POST /hackrx/run
 router.post("/run", async (req, res) => {
   try {
     const { documents, questions } = req.body;
@@ -29,40 +26,23 @@ router.post("/run", async (req, res) => {
       return res.status(400).json({ error: "Missing documents or questions" });
     }
 
-    //  Save PDF to /temp folder
-    const filePath = path.join(path.resolve("temp"), `doc_${Date.now()}.pdf`);
-    const response = await axios.get(documents, { responseType: "stream" });
+    logger.info("📥 Sending to FastAPI...");
 
-    await new Promise((resolve, reject) => {
-      const stream = fs.createWriteStream(filePath);
-      response.data.pipe(stream);
-      stream.on("finish", resolve);
-      stream.on("error", reject);
+    // ✅ Send JSON directly to FastAPI
+    const llmRes = await axios.post(`${process.env.LLM_API_URL}/generate`, {
+      documents,
+      questions,
     });
 
-    logger.info(" PDF downloaded successfully");
+    logger.info("✅ LLM response received");
 
-    //  Prepare form data for FastAPI
-    const formData = new FormData();
-    formData.append("file", fs.createReadStream(filePath));
-    formData.append("query", JSON.stringify(questions));
-
-    //  Call LLM FastAPI (no auth header)
-    const llmRes = await axios.post(process.env.LLM_API_URL, formData, {
-      headers: formData.getHeaders(),
-    });
-
-    //  Clean up temp file
-    fs.unlinkSync(filePath);
-    logger.info(" LLM processing complete");
-
-    //  Send final response
     return res.status(200).json({
       answers: llmRes.data.answers || [],
+      relevant_clauses: llmRes.data.relevant_clauses || [],
     });
   } catch (err) {
-    logger.error(" Run endpoint error:", err.message);
-    res.status(500).json({ error: "Processing failed" });
+    logger.error("❌ Run endpoint error:", err.message);
+    return res.status(500).json({ error: "LLM processing failed" });
   }
 });
 
