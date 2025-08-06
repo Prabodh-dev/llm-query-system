@@ -1,7 +1,6 @@
 fastapi
 pydantic
 uvicorn
-langchain[anthropic]
-openai
-pdfplumber
-python-docx
+google-generativeai
+python-dotenv
+PyPDF2
