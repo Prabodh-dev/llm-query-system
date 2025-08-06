@@ -1,10 +1,12 @@
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.responses import JSONResponse
 import shutil
+import os
+import uvicorn
+
 from schemas import OutputAnswer, Clause
 from chunk_and_embed import load_pdf_clauses
-from gemini_chain import   run_gemini_chain
-import os
+from gemini_chain import run_gemini_chain
 
 app = FastAPI()
 
@@ -27,3 +29,7 @@ async def generate(file: UploadFile, query: str = Form(...)):
 
     except Exception as e:
         return JSONResponse(content={"answers": [f"LLM error: {str(e)}"]}, status_code=500)
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))  
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
