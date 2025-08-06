@@ -26,11 +26,11 @@ def run_gemini_chain(questions: List[str], clauses: List[Clause]) -> List[str]:
             f"Questions:\n{question_str}"
         )
 
-        print("🧠 Sending prompt to Gemini:\n", prompt[:500])
+        print(" Sending prompt to Gemini:\n", prompt[:500])
         response = model.generate_content(prompt)
 
         text = response.text.strip()
-        print("📩 Gemini Raw Response:", text[:500])
+        print(" Gemini Raw Response:", text[:500])
 
         # Extract JSON array from model output
         start = text.find("[")
@@ -42,5 +42,5 @@ def run_gemini_chain(questions: List[str], clauses: List[Clause]) -> List[str]:
         return json.loads(text[start:end])
 
     except Exception as e:
-        print("❌ Error in Gemini:", str(e))
+        print(" Error in Gemini:", str(e))
         return [f"LLM error: {str(e)}"]

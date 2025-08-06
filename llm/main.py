@@ -17,9 +17,9 @@ async def generate(request: Request):
         # Parse JSON body safely
         try:
             body = await request.json()
-            print("✅ Received JSON:", body)
+            print(" Received JSON:", body)
         except Exception as json_error:
-            print("❌ Invalid JSON body:", str(json_error))
+            print(" Invalid JSON body:", str(json_error))
             return JSONResponse(
                 status_code=400,
                 content={
@@ -31,16 +31,16 @@ async def generate(request: Request):
         pdf_url = body.get("documents")
         questions = body.get("questions")
 
-        print("📄 Document URL:", pdf_url)
-        print("❓ Questions:", questions)
+        print(" Document URL:", pdf_url)
+        print(" Questions:", questions)
 
         if not pdf_url or not questions:
             return JSONResponse(status_code=400, content={"error": "Missing documents or questions"})
 
         # Download PDF
-        print("🌐 Downloading PDF from:", pdf_url)
+        print(" Downloading PDF from:", pdf_url)
         pdf_response = requests.get(pdf_url)
-        print("📥 PDF Status Code:", pdf_response.status_code)
+        print(" PDF Status Code:", pdf_response.status_code)
 
         if pdf_response.status_code != 200:
             return JSONResponse(status_code=400, content={"error": "Unable to download PDF"})
@@ -49,20 +49,20 @@ async def generate(request: Request):
             tmp.write(pdf_response.content)
             temp_path = tmp.name
 
-        print("✅ PDF downloaded:", temp_path)
+        print(" PDF downloaded:", temp_path)
 
         # Extract clauses
         clauses = load_pdf_clauses(temp_path)
         os.remove(temp_path)
 
-        print(f"🔍 Extracted {len(clauses)} clauses")
+        print(f" Extracted {len(clauses)} clauses")
 
         # Run Gemini chain
         answers = run_gemini_chain(questions, clauses)
 
-        print("✅ Gemini answers:", answers)
+        print(" Gemini answers:", answers)
 
-        # ✅ FINAL RESPONSE FORMAT
+        #  FINAL RESPONSE FORMAT
         return JSONResponse(
             status_code=200,
             content={
@@ -71,7 +71,7 @@ async def generate(request: Request):
         )
 
     except Exception as e:
-        print("❌ Error in /generate:", str(e))
+        print(" Error in /generate:", str(e))
         return JSONResponse(
             content={"answers": [f"LLM error: {str(e)}"]},
             status_code=500

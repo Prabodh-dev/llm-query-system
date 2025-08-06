@@ -14,7 +14,7 @@ def load_pdf_clauses(pdf_path: str) -> list[Clause]:
         # Split line-by-line and filter junk
         for line in text.split("\n"):
             clean_line = line.strip()
-            if len(clean_line) > 30:  # Ignore junk/small lines
+            if len(clean_line) > 30: 
                 clauses.append(Clause(clause_id=str(clause_id), clause_text=clean_line))
                 clause_id += 1
 
