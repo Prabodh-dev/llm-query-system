@@ -3,10 +3,20 @@ from schemas import Clause
 
 def load_pdf_clauses(pdf_path: str) -> list[Clause]:
     reader = PdfReader(pdf_path)
-    text = ""
-    for page in reader.pages:
-        text += page.extract_text() + "\n"
+    clauses = []
 
-    raw_clauses = [c.strip() for c in text.split("\n\n") if len(c.strip()) > 30]
-    clauses = [Clause(clause_text=clause) for clause in raw_clauses]
+    clause_id = 1
+    for page in reader.pages:
+        text = page.extract_text()
+        if not text:
+            continue
+
+        # Split line-by-line and filter junk
+        for line in text.split("\n"):
+            clean_line = line.strip()
+            if len(clean_line) > 30:  # Ignore junk/small lines
+                clauses.append(Clause(clause_id=str(clause_id), clause_text=clean_line))
+                clause_id += 1
+
+    print(f"🧾 Total Clauses Extracted: {len(clauses)}")
     return clauses
