@@ -38,7 +38,6 @@ router.post("/run", async (req, res) => {
 
     return res.status(200).json({
       answers: llmRes.data.answers || [],
-      relevant_clauses: llmRes.data.relevant_clauses || [],
     });
   } catch (err) {
     logger.error("❌ Run endpoint error:", err.message);
