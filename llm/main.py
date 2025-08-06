@@ -14,11 +14,22 @@ app = FastAPI()
 @app.post("/generate")
 async def generate(request: Request):
     try:
-        body = await request.json()
+        try:
+            body = await request.json()
+            print("✅ Received JSON:", body)
+        except Exception as json_error:
+            print("❌ Invalid JSON body:", str(json_error))
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": "Invalid JSON format",
+                    "details": str(json_error)
+                }
+            )
+
         pdf_url = body.get("documents")
         questions = body.get("questions")
 
-        print("📥 Received request")
         print("📄 Document URL:", pdf_url)
         print("❓ Questions:", questions)
 
