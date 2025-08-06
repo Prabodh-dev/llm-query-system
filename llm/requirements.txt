@@ -4,3 +4,6 @@ uvicorn
 google-generativeai
 python-dotenv
 PyPDF2
+python-multipart
+requests
+pillow
