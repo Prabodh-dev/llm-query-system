@@ -14,6 +14,7 @@ app = FastAPI()
 @app.post("/generate")
 async def generate(request: Request):
     try:
+        # Parse JSON body safely
         try:
             body = await request.json()
             print("✅ Received JSON:", body)
@@ -61,14 +62,20 @@ async def generate(request: Request):
 
         print("✅ Gemini answers:", answers)
 
-        return {
-            "answers": answers,
-            "relevant_clauses": [c.dict() for c in clauses]
-        }
+        # ✅ FINAL RESPONSE FORMAT
+        return JSONResponse(
+            status_code=200,
+            content={
+                "answers": answers
+            }
+        )
 
     except Exception as e:
         print("❌ Error in /generate:", str(e))
-        return JSONResponse(content={"answers": [f"LLM error: {str(e)}"]}, status_code=500)
+        return JSONResponse(
+            content={"answers": [f"LLM error: {str(e)}"]},
+            status_code=500
+        )
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
