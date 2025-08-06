@@ -14,3 +14,8 @@ class OutputAnswer(BaseModel):
     answer_summary: str
     relevant_clauses: List[Clause]
     source_metadata: Optional[dict] = None
+
+class GenerateRequest(BaseModel):
+    documents: str
+    questions: List[str]
+
