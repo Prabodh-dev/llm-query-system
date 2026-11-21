@@ -1,16 +1,33 @@
-import dotenv from "dotenv";
-dotenv.config();
-import express from "express";
+import "dotenv/config";
+import { createApp } from "./src/app.js";
+import { loadConfig } from "./src/config.js";
+import { createLlmClient } from "./src/llmClient.js";
+import { createLogger } from "./src/logger.js";
 
-const PORT = process.env.PORT;
+let config;
+try {
+  config = loadConfig();
+} catch (err) {
+  console.error(`Configuration error: ${err.message}`);
+  process.exit(1);
+}
 
-const app = express();
-
-app.use(express.json());
-
-import runRoute from "./routes/run.js";
-app.use("/hackrx", runRoute);
-
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Backend running on PORT: ${PORT}`);
+const logger = createLogger({ level: config.logLevel });
+const llmClient = createLlmClient({
+  url: config.llmApiUrl,
+  timeoutMs: config.llmTimeoutMs,
+  token: config.llmServiceToken,
 });
+const app = createApp({ config, llmClient, logger });
+
+const server = app.listen(config.port, () => {
+  logger.info("gateway listening", { port: config.port });
+});
+
+function shutdown(signal) {
+  logger.info("shutting down", { signal });
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(1), 10_000).unref();
+}
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
