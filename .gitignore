@@ -18,7 +18,6 @@ __pycache__/
 # ---- BACKEND FOLDER (Node.js) ----
 /backend/node_modules/
 /backend/.env
-/backend/package-lock.json
 /backend/dist/
 /backend/uploads/
 /backend/.next/
@@ -39,3 +38,9 @@ __pycache__/
 /temp/
 /shared/*.pdf
 /shared/*.docx
+
+# ---- TOOLING ----
+.venv/
+venv/
+.pytest_cache/
+coverage/

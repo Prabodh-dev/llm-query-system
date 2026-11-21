@@ -1,0 +1,17 @@
+services:
+  llm:
+    build: ./llm
+    env_file: ./llm/.env
+    environment:
+      PORT: 8000
+
+  gateway:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      PORT: 3000
+      LLM_API_URL: http://llm:8000/generate
+    ports:
+      - "3000:3000"
+    depends_on:
+      - llm
